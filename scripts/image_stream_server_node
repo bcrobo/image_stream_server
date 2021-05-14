@@ -1,0 +1,97 @@
+#!/usr/bin/python
+
+import roslib
+import rospy
+import rospkg
+
+from sensor_msgs.msg import Image, CompressedImage
+from cv_bridge import CvBridge, CvBridgeError
+import threading
+import os
+import cv2
+
+from flask import Response
+from flask import Flask
+from flask import render_template
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import login_required
+
+from werkzeug.security import generate_password_hash
+
+from webapp import db, create_app
+from webapp import models
+
+bridge = CvBridge()
+lock = threading.Lock()
+frame = None
+
+def createPassword(password):
+    print("+ Generate password: {}", generate_password_hash(password))
+
+def generate():
+    global lock, frame
+    while True:
+        with lock:
+            if frame is None:
+                continue
+            (encoded, encoded_frame) = cv2.imencode(".jpg", frame)
+            if not encoded:
+                continue
+        yield(b'--frame\r\n' b'Content-Type:image/jpeg\r\n\r\n' + bytearray(encoded_frame) + b'\r\n')
+
+
+def callback(data):
+    global bridge, lock, frame
+    try:
+        received = bridge.imgmsg_to_cv2(data, "bgr8")
+        with lock:
+            frame = received.copy()
+    except CvBridgeError as e:
+        print(e)
+
+
+def callbackCompressed(data):
+    global bridge, lock, frame
+    try:
+        received = bridge.compressed_imgmsg_to_cv2(data, "bgr8")
+        with lock:
+            frame = received.copy()
+    except CvBridgeError as e:
+        print(e)
+
+
+if __name__ == '__main__':
+    # Initialize the node and name it
+    rospy.init_node('image_stream_server_node')
+    try:
+        port = rospy.get_param("~port")
+        image_topic = rospy.get_param("~image_topic")
+        cert_path = rospy.get_param("~cert_path")
+        key_path = rospy.get_param("~key_path")
+        # Subscribe to the image topic
+        if "compressed" in image_topic:
+            image_sub = rospy.Subscriber(image_topic, CompressedImage, callbackCompressed)
+        else:
+            image_sub = rospy.Subscriber(image_topic, Image, callback)
+        webapp = create_app()
+        @webapp.route("/video_feed")
+        @login_required
+        def video_feed():
+            return Response(generate(), mimetype = "multipart/x-mixed-replace; boundary=frame")
+        # Creates user database
+        with webapp.app_context():
+            db.create_all()
+            bruno = models.User.query.filter_by(email="bruno.celaries@gmail.com").first()
+            if not bruno:
+                db.session.add(models.User(email="bruno.celaries@gmail.com", password='pbkdf2:sha256:50000$K4Jb7Ara$ff5947f07e5f5362cb9d31221198123113e3f27723e50b0f821b07a9591c8be9'))
+                db.session.commit()
+            melo = models.User.query.filter_by(email="melo.melo@gmail.com").first()
+            if not melo:
+                db.session.add(models.User(email="melo.melo@gmail.com", password='pbkdf2:sha256:50000$VZUMy5PW$8bfc608f5d1dc3c68fcbb2bd13ffe611b07bbd4919abe7f5d5b0bd17e0e232c7'))
+                db.session.commit()
+        rospack = rospkg.RosPack()
+        pkg_dir = rospack.get_path("image_stream_server")
+        #webapp.run(host='192.168.1.178', port=port, debug=True, threaded=True, use_reloader=False, ssl_context=(cert_path, key_path))
+        webapp.run(host='127.0.0.1', port=port, debug=True, threaded=True, use_reloader=False)
+        rospy.spin()
+    except rospy.ROSInterruptException: pass

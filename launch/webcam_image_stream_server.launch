@@ -1,0 +1,20 @@
+<launch>
+  <arg name="location" value="living_room" />
+
+  <node name="webcam_node" pkg="webcam" type="webcam_node">
+    <param name="id" type="int" value="0" />
+    <param name="frame_id" type="str" value="$(arg location)" />
+    <param name="width" type="int" value="1280" />
+    <param name="height" type="int" value="720" />
+    <param name="fps" type="int" value="30" />
+  </node>
+  <param name="/webcam/$(arg location)/image/compressed/format" type="str" value="jpeg" />
+  <param name="/webcam/$(arg location)/image/compressed/jpeg_quality"  value="10"/>
+
+  <node name="image_stream_server_node" pkg="image_stream_server" type="image_stream_server_node" output="screen">
+    <param name="cert_path" type="str" value="/etc/letsencrypt/live/home-network.hd.free.fr/cert.pem" />
+    <param name="key_path" type="str" value="/etc/letsencrypt/live/home-network.hd.free.fr/privkey.pem" />
+    <param name="image_topic" type="str" value="/webcam/$(arg location)/image/compressed" />
+    <param name="port" type="int" value="5000" />
+  </node>
+</launch>

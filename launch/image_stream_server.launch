@@ -1,0 +1,8 @@
+<launch>
+  <node name="image_stream_server_node" pkg="image_stream_server" type="image_stream_server_node" output="screen">
+    <param name="port" type="int" value="5555" />
+    <param name="cert_path" type="str" value="/etc/letsencrypt/live/home-network.hd.free.fr/fullchain.pem" />
+    <param name="key_path" type="str" value="/etc/letsencrypt/live/home-network.hd.free.fr/privkey.pem" />
+    <param name="image_topic" type"str" value="/webcam/living_room/image" />
+  </node>
+</launch>

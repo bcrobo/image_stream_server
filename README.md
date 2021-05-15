@@ -16,11 +16,16 @@ Some internet provider offer a DNS service that can be used for your web applica
 
 ## 3. Use Nginx server as reverse proxy
 
-[Nginx](https://www.nginx.com/) server is another web server. Compared to `Flask`, `Nginx` is production oriented server. However, `Flask` is very practical for prototyping and hobbies. Using `Nginx` as a reverse proxy allow to dedicate the SSL security to `Nginx` while keeping the content in under the `Flask` scope.
-Under is a small diagram that explain what's happening when you try to reach the server:
+[Nginx](https://www.nginx.com/) server is another web server. Compared to `Flask`, `Nginx` is production oriented server. However, `Flask` is very practical for prototyping and hobbies. Using `Nginx` as a reverse proxy allow to dedicate the SSL security to `Nginx` while keeping the content under the hood of `Flask` server. Below is a small diagram that explain what's happening when you try to reach the server:
 
+![Image Stream Server Image](https://github.com/bcrobo/image_stream_server/blob/main/doc/img/image_stream_server.png)
 
+You can easily install `Nginx` using `sudo apt-get install nginx`. Once this is done, you should configure `Nginx` to act as a proxy.
+This will be describe in section 5.
 
 ## 4. Ask a SSL certificate from LetsEncrypt entity (remote access only)
 
 [LetsEncrypt](https://letsencrypt.org/) is a nonprofit certificate authority. You can ask for a certificate using their utility program `certbot`. Its installation is very simple `sudo apt-get install certbot`.
+
+To ask a certificate you can use the following command line:
+`sudo letsencrypt certonly --dry-run --manual --email youremailaddress@xxxxx.com -d xxxxxxx.hd.free.fr`

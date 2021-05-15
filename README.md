@@ -33,7 +33,7 @@ To ask a certificate you can use the following command line:
 `sudo letsencrypt certonly --dry-run --manual --email youremailaddress@xxxxx.com -d xxxxxxx.hd.free.fr`
 
 It will prompt you a message asking to your server to reply a specific hash when a specific URL is queried by `LetsEncrypt`. By doing so, `LetsEncrypt` so they ensure you are the owner of the server. For doing this we will modify our `Flash` application to answer that hash.
-Once this is done, you should have a certificate, and a private key in the `/etc/letsencrypt` directory.
+Once this is done, you should have a certificate, and a private key in the `/etc/letsencrypt/live/your-dns-name` directory.
 
 **NOTE**: This operation can also be performed at the `Nginx` level.
 
@@ -55,7 +55,28 @@ You can create a `Nginx` configuration file in `/etc/nginx/conf.d` directory and
 The configuration file typically look like this:
 
 ```
-content of configuration
+server {
+  listen 443 ssl;
+  server_name your-dns-name www.your-dns-name;
+  ssl_certificate /etc/letsencrypt/live/your-dns-name/cert.pem;
+  ssl_certificate_key /etc/letsencrypt/live/your-dns-name/privkey.pem;
+  location / {
+    proxy_pass http://127.0.0.1:5000/;
+    #proxy_set_header Host $host;
+    #proxy_set_header X-Real-IP $remote_addr;
+    #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+
+server {
+    listen 80;
+    server_name your-dns-name www.your-dns-name;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
 ```
 
 Your server is now ready to receive incoming connections.
@@ -67,3 +88,5 @@ The last step is to open the `443` (https) port for `TCP` traffic on your router
 ![Port Redirection](https://github.com/bcrobo/image_stream_server/blob/main/doc/img/port_redirection.png)
 
 Once enable, you should be able to reach your server from the world wide web.
+
+

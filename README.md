@@ -78,7 +78,7 @@ server {
 }
 
 ```
-
+As you can see the incoming traffic of the `Nginx` server is redirected toward the loopback address on wich my server is running.
 Your server is now ready to receive incoming connections.
 
 ### 1.6 Router port redirection

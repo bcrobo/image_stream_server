@@ -51,7 +51,7 @@ The certificate is usually valid for a period of 90 days but it can be easily re
 ### 1.5 Configuration of Nginx
 
 Now, we'll indicate `Nginx` to listen on the `443` port (https) and to redirect all `80` port traffic to the `443` port to be sure that the connection to your server will be secure using the `https` protocol. Furthermore we will give him the path to certificate file and private key to use to encrypt the connection.
-You can create a `Nginx` configuration file in `/etc/nginx/conf.d` directory and link that file into the `/etc/nginx/site-enabled` and directories.
+You can create a `Nginx` configuration file in `/etc/nginx/conf.d` directory and link that file into the `/etc/nginx/site-enabled` and `/etc/nginx/site-available` directories.
 The configuration file typically look like this:
 
 ```

@@ -89,4 +89,9 @@ The last step is to open the `443` (https) port for `TCP` traffic on your router
 
 Once enable, you should be able to reach your server from the world wide web.
 
+## 2. ROS node
+
+The ROS node offers the possibility to configure the server port and the image topic. The implementation handle an incoming topic image and display it in the web application. `sensor_msgs/Image` and `sensor_msgs/CompressedImage` topics are handled (`sensor_msgs/CompressedImage` are recommended as they offer a better frame rate for streaming). Below is an example of the `image_stream_server` node in action with the `webcam` node.
+
+![Example](https://github.com/bcrobo/image_stream_server/blob/main/doc/img/image_stream_server.gif)
 

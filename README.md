@@ -4,7 +4,7 @@
 
 `image_stream_server` is a ROS node that wraps a python Flask web server. It is designed to offer a very simple web interface for the different ROS projects. The following sections described the different steps to perform to setup up the web server. The first two sections might differ depending on your ISP (Internet Service Provider) but aren't necessary if you want to keep your web server within you local network. However, if you want to access that server from the world wide web you will need them.
 
-Third 
+The following sections are divided in two parts. The first one detail the setup of the web server and the second one describe the ROS node associated to the server followed by an example using the `webcam` node. 
 
 ## 1. Web application remote access
 ### 1.1 Ask to your ISP a static ip
